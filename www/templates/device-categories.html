@@ -1,0 +1,15 @@
+<ion-view id='devices' view-title="Add a Device">
+  <ion-content>
+
+    <div class='list animate-fade-slide-in-right'>
+        
+        <a ng-repeat='(category, devices) in devicesByCategory' ui-sref="app.devices({ category: category })" class="item item-avatar">
+          <img class='teal' ng-src="img/{{ category }}.png">
+          <h2>{{ category | capitalize }}</h2>
+          <p>{{ deviceManufacturers( devices ) }}</p>
+        </a>
+
+    </div>
+
+  </ion-content>
+</ion-view>

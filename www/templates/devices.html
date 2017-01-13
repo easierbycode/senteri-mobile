@@ -1,0 +1,11 @@
+<ion-view id='devices' view-title="{{ category | capitalize }}">
+  <ion-content>
+    <div class='list animate-fade-slide-in-right'>
+      <a ng-repeat='device in devices | filter: {category: category}' href="#/app/verify/{{ verificationPage( device ) }}" class="item item-avatar">
+        <img class='teal' ng-src="img/{{ device.icon || device.category }}.png">
+        <h2>{{ device.title }}</h2>
+        <p>{{ device.manufacturer }}</p>
+      </a>
+    </div>
+  </ion-content>
+</ion-view>
