@@ -16,8 +16,17 @@ ion-content {
   background-color: #f5f5f5;
 }
 
-#devices .item-avatar > img:first-child {
+ion-header-bar {
+  text-transform: uppercase;
+}
+
+#device-categories .item-avatar > img:first-child {
   border-radius: 0;
+}
+
+#device-categories .bar-subheader button {
+  max-width: 100%;
+  width: 100%;
 }
 
 img.teal {

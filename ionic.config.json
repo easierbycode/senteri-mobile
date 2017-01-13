@@ -1,6 +1,6 @@
 {
   "name": "HomeClub",
-  "app_id": "",
+  "app_id": "eca18764",
   "gulpStartupTasks": [
     "sass",
     "watch"

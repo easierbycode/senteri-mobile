@@ -4,7 +4,7 @@
 var rootRef  = firebase.database().ref();
 
 
-angular.module('starter', ['firebase', 'ionic', 'ionic-material', 'ui.router'])
+angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ui.router'])
 
 
 .run(function($ionicPlatform) {
@@ -21,6 +21,36 @@ angular.module('starter', ['firebase', 'ionic', 'ionic-material', 'ui.router'])
     }
     if(window.StatusBar) {
       StatusBar.styleDefault();
+    }
+  });
+})
+
+
+.controller( 'AppCtrl', function( $ionicDeploy, $ionicPopup, $scope ) {
+  $ionicDeploy.check().then(function(snapshotAvailable) {
+    if (snapshotAvailable) {
+      // When snapshotAvailable is true, you can apply the snapshot
+      $ionicDeploy.download().then(function() {
+        return $ionicDeploy.extract().then(function() {
+          $scope.showPopup = function() {
+            $ionicPopup.show({
+              title: 'Update complete',
+              subTitle: 'Restart app now?',
+              buttons: [
+                {
+                  text: '<b>Now</b>',
+                  type: 'button-assertive',
+                  onTap: function() {
+                    // restart app
+                    $ionicDeploy.load();
+                  }
+                },
+                { text: 'Later' }
+              ]
+            });
+          };
+        })
+      });
     }
   });
 })
@@ -103,14 +133,21 @@ angular.module('starter', ['firebase', 'ionic', 'ionic-material', 'ui.router'])
 })
 
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function( $ionicCloudProvider, $stateProvider, $urlRouterProvider ) {
+
+  $ionicCloudProvider.init({
+    "core": {
+      "app_id": "eca18764"
+    }
+  });
 
   $stateProvider
 
   .state('app', {
     url: '/app',
     abstract: true,
-    templateUrl: 'templates/menu.html'
+    templateUrl: 'templates/menu.html',
+    controller: 'AppCtrl'
   })
 
   .state('app.verifyHue', {
