@@ -19,8 +19,8 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       // a much nicer keyboard experience.
       cordova.plugins.Keyboard.disableScroll(true);
     }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
+    if(window.StatusBar && cordova.platformId == 'android') {
+      StatusBar.backgroundColorByHexString( '#33B8B5' );
     }
   });
 })
@@ -30,25 +30,23 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
   $ionicDeploy.check().then(function(snapshotAvailable) {
     if (snapshotAvailable) {
       // When snapshotAvailable is true, you can apply the snapshot
-      $ionicDeploy.download().then(function() {
-        return $ionicDeploy.extract().then(function() {
-          $scope.showPopup = function() {
-            $ionicPopup.show({
-              title: 'Update complete',
-              subTitle: 'Restart app now?',
-              buttons: [
-                {
-                  text: '<b>Now</b>',
-                  type: 'button-assertive',
-                  onTap: function() {
-                    // restart app
-                    $ionicDeploy.load();
-                  }
-                },
-                { text: 'Later' }
-              ]
-            });
-          };
+      $ionicDeploy.download().then(() => {
+        return $ionicDeploy.extract().then(() => {
+          $ionicPopup.show({
+            title: 'Update complete',
+            subTitle: 'Restart app now?',
+            buttons: [
+              {
+                text: '<b>Now</b>',
+                type: 'button-assertive',
+                onTap: () => {
+                  // restart app
+                  $ionicDeploy.load();
+                }
+              },
+              { text: 'Later' }
+            ]
+          });
         })
       });
     }
