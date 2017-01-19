@@ -1,10 +1,18 @@
 
 'use strict';
 
+// TODO: remove this temp hack once login is in place
+var currentUser = {
+  _id: '-=DEBUG_USER=-'
+};
+
+var nestClientId      = "829579eb-682c-4e44-b69b-d40df3ad9ab2";
+var nestClientSecret  = "OvjjBj81jV8JFSTE5swkhXjwA";
+
 var rootRef  = firebase.database().ref();
 
 
-angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ui.router'])
+angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ngCordova', 'ui.router'])
 
 
 .run(function($ionicPlatform) {
@@ -27,6 +35,7 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 
 
 .controller( 'AppCtrl', function( $ionicDeploy, $ionicPopup, $scope ) {
+
   $ionicDeploy.check().then(function(snapshotAvailable) {
     if (snapshotAvailable) {
       // When snapshotAvailable is true, you can apply the snapshot
@@ -74,6 +83,8 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 
 .controller( 'DevicesCtrl', function( $firebaseArray, $scope, $stateParams, $timeout, ionicMaterialMotion ) {
   $scope.category   = $stateParams.category;
+  
+  // TODO: does this need alpha sort?  -  orderByChild( 'title' )
   $scope.devices    = $firebaseArray( rootRef.child( 'devices' ) );
 
   $scope.verificationPage = function ( device ) {
@@ -100,7 +111,7 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
           
           if ( hueResp.data[0] && hueResp.data[0].error ) {
             var errorText = hueResp.data[0].error.description;
-            return alert(errorText);
+            return alert( errorText );
           }
           
           if ( hueResp.data[0] && hueResp.data[0].success ) {
@@ -112,7 +123,7 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
               fullStateResp.data.verifyDate = new Date().getTime();
               // if (LatestGpsCoordinates.get())  fullStateResp.data.verifiedFromGpsPosition = LatestGpsCoordinates.get();
               
-              // rootRef.child( currentUser._id ).child('thirdPartyDevices').update( {phillipsHue: fullStateResp.data} );
+              rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser._id ).update( { phillipsHue: fullStateResp.data } );
             })
           }
         })
@@ -121,6 +132,66 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       }
     })
   }
+})
+
+
+.controller( 'VerifyNestCtrl', function( $cordovaInAppBrowser, $http, $ionicPopup, $location, $rootScope, $scope ) {
+  
+  $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+  
+  $scope.login = function() {
+
+        var options = {
+          location    : 'no',
+          clearcache  : 'yes',
+          toolbar     : 'no'
+        };
+        
+        $cordovaInAppBrowser.open( 'https://home.nest.com/login/oauth2?client_id=829579eb-682c-4e44-b69b-d40df3ad9ab2&state=' + new Date().getTime(), '_blank', options );
+        
+        $scope.getCodeFromUrl = function( e, event ) { 
+            if((event.url).startsWith( 'https://homeclub.us/auth/nest/callback' )) {
+                let requestToken  = event.url.split( 'code=' )[1];
+                
+                $http({method: "post", url: "https://api.home.nest.com/oauth2/access_token", data: "client_id=" + nestClientId + "&client_secret=" + nestClientSecret + "&grant_type=authorization_code" + "&code=" + requestToken })
+                    .success(function( data ) {
+                      let accessToken = data.access_token;
+                      
+                      var ref = new Firebase( 'wss://developer-api.nest.com' );
+                      ref.auth( accessToken );
+                      ref.on('value', function( snapshot ) {
+                        var nestData = {
+                          devices     : snapshot.val().devices,
+                          verifyDate  : new Date().getTime()
+                        }
+                        
+                        // if (LatestGpsCoordinates.get())  nestData.verifiedFromGpsPosition = LatestGpsCoordinates.get();
+                        
+                        rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser._id ).update( { nest: nestData } );
+
+                        $ionicPopup.alert({
+                          title: 'Nest devices verified!'
+                        });
+                      });
+                    })
+                    .error(function( data, status ) {
+                      alert("ERROR: " + data);
+                    });
+
+                $cordovaInAppBrowser.close();
+            }
+        }
+
+        $rootScope.$on( '$cordovaInAppBrowser:loadstart', $scope.getCodeFromUrl );
+        $rootScope.$on( '$cordovaInAppBrowser:loaderror', $scope.getCodeFromUrl );
+    }
+    
+    if ( typeof String.prototype.startsWith != 'function' ) {
+        String.prototype.startsWith = function ( str ){
+            return this.indexOf( str ) == 0;
+        };
+    }
+  
 })
 
 
@@ -154,6 +225,16 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       'menuContent': {
         templateUrl: 'templates/verify/philips-hue.html',
         controller: 'VerifyHueCtrl'
+      }
+    }
+  })
+
+  .state('app.verifyNest', {
+    url: '/verify/nest-nest-learning-thermostat',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/verify/nest-nest-learning-thermostat.html',
+        controller: 'VerifyNestCtrl'
       }
     }
   })
