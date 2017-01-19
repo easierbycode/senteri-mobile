@@ -9,6 +9,7 @@
     "firebase": "3.6.5",
     "angular-ui-router": "^0.3.2",
     "lodash": "^4.17.4",
-    "angularfire": "^2.2.0"
+    "angularfire": "^2.2.0",
+    "ngCordova": "^0.1.27-alpha"
   }
 }
