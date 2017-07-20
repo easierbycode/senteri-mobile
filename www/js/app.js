@@ -12,7 +12,7 @@ var nestClientSecret  = "OvjjBj81jV8JFSTE5swkhXjwA";
 var rootRef  = firebase.database().ref();
 
 
-angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ngCordova', 'ui.router'])
+angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ionMdInput', 'ngCordova', 'ui.router'])
 
 
 .run(function($ionicPlatform) {
@@ -34,7 +34,68 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 })
 
 
-.controller( 'AppCtrl', function( $ionicDeploy, $ionicPopup, $scope ) {
+.controller( 'AppCtrl', function( $ionicDeploy, $ionicPlatform, $ionicPopup, $scope ) {
+
+  var Datagram;
+  var socket;
+  
+  $ionicPlatform.ready(function() {
+
+    if ( !window.cordova )  return;
+    
+    Datagram  = cordova.require( 'cordova-plugin-dgram.dgram' );
+    socket    = Datagram.createSocket( 'udp4', 25000 );
+    
+    socket.bind(function (error, port) {
+      if (error !== null) {
+        console.log(error, port);
+      }
+
+      // PORT:  OK          <- initial run
+      // PORT:  undefined   <- after 'hot' reload
+      // Object {error: "java.net.BindException: bind failed: EADDRINUSE (Address already in use)", stacktrace: "java.net.BindException: bind failed: EADDRINUSE (A….io.IoBridge.bind(IoBridge.java:97)↵	... 12 more↵"}
+      console.log( 'PORT: ', port );
+    });
+    
+    socket.on('message', function (message, remoteAddress) {
+      if (message.length > 0) {
+        // process response message
+        console.log( message, remoteAddress );
+      }
+    });
+
+  })
+  
+  $scope.BroadcastMessage = function( text ) {
+    console.log( 'UDP MESSAGE: ', text );
+    // socket.send( text, '255.255.255.255', 25000 );
+    socket.send( text, '230.185.192.108', 25000 );
+  }
+  
+  $scope.clearFabs = function() {
+      var fabs = document.getElementsByClassName('button-fab');
+      if (fabs.length && fabs.length > 1) {
+          fabs[0].remove();
+      }
+  }
+  
+  $scope.hideHeader = function() {
+      $scope.hideNavBar();
+      $scope.noHeader();
+  }
+  
+  $scope.hideNavBar = function() {
+      document.getElementsByTagName('ion-nav-bar')[0].style.display = 'none';
+  }
+
+  $scope.noHeader = function() {
+      var content = document.getElementsByTagName('ion-content');
+      for (var i = 0; i < content.length; i++) {
+          if (content[i].classList.contains('has-header')) {
+              content[i].classList.toggle('has-header');
+          }
+      }
+  }
 
   $ionicDeploy.check().then(function(snapshotAvailable) {
     if (snapshotAvailable) {
@@ -60,6 +121,22 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       });
     }
   });
+})
+
+
+.controller( 'DashboardCtrl', function( $http, $scope, $timeout, ionicMaterialMotion ) {
+  
+  $http.get( '/000780153CB2.json' ).then(function( resp ) {
+    console.log( resp );
+    
+    $scope.sensorHubRealtime            = resp.data.sensorHubs;
+    $scope.latestNetworkHubPowerSource  = resp.data.latestPowerStatus;
+    $scope.latestNetworkHubRssi         = resp.data.latestRssi;
+  })
+  
+  // $timeout(function() {
+  //   ionicMaterialMotion.fadeSlideInRight();
+  // }, 13);
 })
 
 
@@ -94,6 +171,15 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
   $timeout(function() {
     ionicMaterialMotion.fadeSlideInRight();
   }, 13);
+})
+
+
+.controller('LoginCtrl', function( $scope, $timeout, $stateParams, ionicMaterialInk ) {
+    $scope.$parent.clearFabs();
+    $timeout(function() {
+        $scope.$parent.hideHeader();
+    }, 0);
+    ionicMaterialInk.displayEffect();
 })
 
 
@@ -218,6 +304,16 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
     templateUrl: 'templates/menu.html',
     controller: 'AppCtrl'
   })
+  
+  .state('app.dashboard', {
+    url: '/dashboard',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/dashboard.html',
+        controller: 'DashboardCtrl'
+      }
+    }
+  })
 
   .state('app.verifyHue', {
     url: '/verify/philips-hue',
@@ -267,6 +363,16 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       }
     }
   })
+  
+  .state('app.login', {
+    url: '/login',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/login.html',
+        controller: 'LoginCtrl'
+      }
+    }
+  })
 
-  $urlRouterProvider.otherwise('/app/device-categories');
+  $urlRouterProvider.otherwise('/app/login');
 });

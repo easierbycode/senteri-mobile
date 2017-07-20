@@ -1,0 +1,22 @@
+<ion-view id="dashboard" view-title="Dashboard" cache-view="false">
+    <ion-content class="has-header">
+        <!--ion-refresher(on-refresh='refreshLatest()')-->
+        <div class="card">
+            <div class="item item-divider">Network Hub
+                <div style="font-size:20px" class="item-note"> <i ng-if="latestNetworkHubPowerSource.powerSource == 1" class="icon ion-battery-half assertive"></i><i ng-if="latestNetworkHubPowerSource.powerSource == 2" class="icon ion-battery-charging balanced"></i></div>
+                <div style="font-size:24px; padding-right:5px" class="item-note"><i ng-class="cssClassByRssiThreshold(latestNetworkHubRssi.rssi)" class="icon ion-wifi"></i></div>
+            </div>
+        </div>
+        <div ng-repeat="(sensorHubMacAddress, roomName) in currentUser.roomNamesBySensorHubMacAddress" class="card">
+            <div class="item item-divider">{{ roomName }}
+                <div class="item-note"><span style="color:#4f9fcf; padding-right:2px"> {{ sensorHubRealtime[sensorHubMacAddress].sensorHubData1 }} ℉</span> {{ sensorHubRealtime[sensorHubMacAddress].updateTime | date:'MMM d h:mm a' : 'UTC' }}</div>
+            </div>
+            <div ng-if="noAlert( sensorHubMacAddress ) &amp;&amp; showOkIfNoAlerts( roomName )" class="item ok"><button class="button button-clear button-small button-balanced button-icon ion-checkmark"> OK</button></div>
+            <div ng-click="toggleAlerts( sensorHubMacAddress )" ng-if="hasAlert( sensorHubMacAddress )" ng-bind-html="alerttext.sensorHubEvent(sensorHubRealtime[sensorHubMacAddress].latestAlert)" class="item item-icon-left alert"></div>
+            <div ng-if="hasAlert( sensorHubMacAddress )" style="top:-8px" class="item ok"><button ng-click="toggleAlerts( sensorHubMacAddress )" class="button button-clear button-small button-positive button-icon"><span ng-show="alerts[sensorHubMacAddress] == undefined"><i class="ion-arrow-right-b"></i> show last 12 hours</span><span ng-show="alerts[sensorHubMacAddress] != undefined"><i class="ion-arrow-down-b"></i> hide last 12 hours</span></button></div>
+            <div ng-repeat="alert in alerts[sensorHubMacAddress] | orderBy:'-timestamp'" ng-bind-html="alerttext.sensorHubEvent( alert )" class="item item-icon-left alert"></div>
+            <div ng-show="latest[sensorHubMacAddress].sensorHubData2 != undefined" class="item item-icon-left"><i class="icon ion-lightbulb"></i>{{ latest[sensorHubMacAddress].sensorHubData2 }} lux</div>
+            <div ng-show="latest[sensorHubMacAddress].sensorHubData3 != undefined" class="item item-icon-left"><i class="icon ion-ios-rainy"></i>{{ latest[sensorHubMacAddress].sensorHubData3 }}%</div>
+        </div>
+    </ion-content>
+</ion-view>

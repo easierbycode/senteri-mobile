@@ -8,12 +8,14 @@
   "watchPatterns": [
     "www/**/*",
     "!www/lib/**/*",
-    "!www/**/*.map"
+    "!www/**/*.map",
+    "scss/**/*"
   ],
   "proxies": [
     {
       "path": "/api/nupnp",
       "proxyUrl": "http://www.meethue.com/api/nupnp"
     }
-  ]
+  ],
+  "type": "ionic1"
 }

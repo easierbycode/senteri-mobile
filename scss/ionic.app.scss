@@ -58,3 +58,30 @@ img.teal {
 .button-positive:active, .button-positive:hover {
   background-color: $assertive !important;
 }
+
+/* Login
+==================================*/
+.app-icon {
+    background-color: #fff;
+    background: url('../img/homeclub-white.png') center;
+    background-size: cover;
+    border-radius: 50%;
+    height: 125px;
+    margin: 0 auto;
+    width: 125px;
+}
+
+.logo {
+    width: 128px;
+    height: 128px;
+    line-height: 128px;
+    font-size: 86px;
+    font-weight: 500;
+    margin: 32px auto;
+    color: #fff;
+    border-radius: 2px;
+}
+
+.md-accent-bg {
+    background-color: rgb(0,150,136);
+}
