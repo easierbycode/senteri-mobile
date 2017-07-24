@@ -11,7 +11,6 @@ var nestClientSecret  = "OvjjBj81jV8JFSTE5swkhXjwA";
 
 var rootRef  = firebase.database().ref();
 
-
 angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ionMdInput', 'ngCordova', 'ui.router'])
 
 
@@ -127,16 +126,14 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 .controller( 'DashboardCtrl', function( $http, $scope, $timeout, ionicMaterialMotion ) {
   
   $http.get( '/000780153CB2.json' ).then(function( resp ) {
-    console.log( resp );
-    
     $scope.sensorHubRealtime            = resp.data.sensorHubs;
     $scope.latestNetworkHubPowerSource  = resp.data.latestPowerStatus;
     $scope.latestNetworkHubRssi         = resp.data.latestRssi;
+
+    $timeout(function() {
+      ionicMaterialMotion.fadeSlideInRight({ selector: '.card' });
+    }, 13);
   })
-  
-  // $timeout(function() {
-  //   ionicMaterialMotion.fadeSlideInRight();
-  // }, 13);
 })
 
 
@@ -149,7 +146,7 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 
     $timeout(function() {
       ionicMaterialMotion.fadeSlideInRight();
-    }, 13);
+    }, 0);
   })
 
   $scope.deviceManufacturers  = function( devices ) {
@@ -164,17 +161,83 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
   // TODO: does this need alpha sort?  -  orderByChild( 'title' )
   $scope.devices    = $firebaseArray( rootRef.child( 'devices' ) );
 
+  $scope.devices.$loaded().then(function( data ) {
+    $timeout(function() {
+      ionicMaterialMotion.fadeSlideInRight();
+    }, 0);
+  })
+
   $scope.verificationPage = function ( device ) {
     return [ device.manufacturer, device.title ].join( '-' ).replace( /\s/g, '-' ).toLowerCase();
   }
-
-  $timeout(function() {
-    ionicMaterialMotion.fadeSlideInRight();
-  }, 13);
 })
 
 
-.controller('LoginCtrl', function( $scope, $timeout, $stateParams, ionicMaterialInk ) {
+.controller('LoginCtrl', function( $ionicHistory, $scope, $timeout, $state, $stateParams, ionicMaterialInk ) {
+    
+    $ionicHistory.nextViewOptions({
+        historyRoot: true
+    });
+    
+    $scope.userInput  = {};
+    
+    $scope.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('login-button', {
+      'size': 'invisible',
+      'callback': function(response) {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        $scope.onSignInSubmit();
+      }
+    });
+
+    $scope.recaptchaVerifier.render().then(function(widgetId) {
+      $scope.recaptchaWidgetId = widgetId;
+    });
+
+    $scope.onSignInSubmit = function() {
+
+      console.log( '.. onSignInSubmit' );
+
+      firebase.auth().signInWithPhoneNumber( $scope.userInput.phoneNumber, $scope.recaptchaVerifier )
+        .then(function( confirmationResult ) {
+          $scope.confirmationResult = confirmationResult;
+
+          document.getElementById( 'login-form' ).style.display = 'none';
+          document.getElementById( 'verification-code-form' ).style.display = 'block';
+        })
+
+      // console.log( $scope.userInput.phoneNumber );
+
+      // window.FirebasePlugin.verifyPhoneNumber( $scope.userInput.phoneNumber, 0, function( credential ) {
+      //   console.log( 'verifyPhoneNumber COMPLETE' );
+      //   console.log( credential );
+      //   $scope.verificationId = credential.verificationId;
+
+      //   document.getElementById( 'login-form' ).style.display = 'none';
+      //   document.getElementById( 'verification-code-form' ).style.display = 'block';
+      // }, function( err ) {
+      //   console.log( 'BOOM' );
+      //   console.log( err );
+      // });
+    }
+    
+    $scope.onVerifyCodeSubmit = function() {
+      $scope.confirmationResult.confirm( $scope.userInput.verificationCode ).then(function( result ) {
+        $state.go( 'app.devices' );
+        document.getElementsByTagName('ion-nav-bar')[0].style.display = 'block';
+      })
+      // var signInCredential = firebase.auth.PhoneAuthProvider.credential(
+      //   $scope.verificationId,
+      //   $scope.userInput.verificationCode
+      // );
+      
+      // firebase.auth().signInWithCredential( signInCredential )
+      //   .then(function( credential ) {
+      //     console.log( credential );
+      //     $state.go( 'app.devices' );
+      //     document.getElementsByTagName('ion-nav-bar')[0].style.display = 'block';
+      //   })
+    }
+
     $scope.$parent.clearFabs();
     $timeout(function() {
         $scope.$parent.hideHeader();

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "625516154588",
+    "firebase_url": "https://homeclub2-cd98f.firebaseio.com",
+    "project_id": "homeclub2-cd98f",
+    "storage_bucket": "homeclub2-cd98f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625516154588:android:aa9134f9d35159cd",
+        "android_client_info": {
+          "package_name": "com.ionicframework.ionicfoo2319126"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "625516154588-5r5fbgul86qfhe3si1m8qcg477r57ca7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUcaz-kiOsi04DZRlCJG5qYtmWfR4Eqgo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

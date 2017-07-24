@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>625516154588-47e4n6r2908a1p7jeh94qst481ddotso.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.625516154588-47e4n6r2908a1p7jeh94qst481ddotso</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCPmC1XQJ3bnCAwwVYLV-n6I81eTy7pBt0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>625516154588</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ionicframework.ionicfoo2319126</string>
+	<key>PROJECT_ID</key>
+	<string>homeclub2-cd98f</string>
+	<key>STORAGE_BUCKET</key>
+	<string>homeclub2-cd98f.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:625516154588:ios:aa9134f9d35159cd</string>
+	<key>DATABASE_URL</key>
+	<string>https://homeclub2-cd98f.firebaseio.com</string>
+</dict>
+</plist>

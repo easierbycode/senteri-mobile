@@ -1,0 +1,44 @@
+{
+  "latestPowerStatus" : {
+    "battery" : 100,
+    "powerSource" : 2,
+    "powerSourceUpdateTime" : 1494246409000,
+    "updateTime" : 1494254359000
+  },
+  "latestRssi" : {
+    "rssi" : -33,
+    "updateTime" : 1494254359000
+  },
+  "sensorHubs" : {
+    "000780153E43" : {
+      "sensorHubBattery" : 67,
+      "sensorHubData1" : 77,
+      "sensorHubRssi" : -57,
+      "sensorHubType" : 1,
+      "updateTime" : 1494253968000
+    },
+    "000780153E6C" : {
+      "latestAlert" : {
+        "sensorEventEnd" : 8,
+        "sensorEventStart" : 0,
+        "sensorHubBattery" : 59,
+        "sensorHubRssi" : -55,
+        "updateTime" : 1494234894000
+      },
+      "sensorHubBattery" : 62,
+      "sensorHubData1" : 80.6,
+      "sensorHubData2" : 775,
+      "sensorHubData3" : 35,
+      "sensorHubRssi" : -47,
+      "sensorHubType" : 2,
+      "updateTime" : 1494254210000
+    },
+    "000780153E79" : {
+      "sensorHubBattery" : 78,
+      "sensorHubData1" : 75.2,
+      "sensorHubRssi" : -46,
+      "sensorHubType" : 1,
+      "updateTime" : 0
+    }
+  }
+}
