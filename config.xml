@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.ionicframework.ionicfoo2319126" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Senteri</name>
+    <name>HomeClub</name>
     <description>
         Device verification for connected policyholders.
     </description>
@@ -79,7 +79,6 @@
         <variable name="CAMERA_USAGE_DESCRIPTION" value=" " />
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" " />
     </plugin>
-    <plugin name="cordova-plugin-console" spec="^1.0.7" />
     <plugin name="cordova-plugin-device" spec="^1.1.6" />
     <plugin name="cordova-plugin-dgram" spec="git+https://github.com/andischerer/cordova-plugin-dgram.git" />
     <plugin name="cordova-plugin-file-transfer" spec="^1.6.3" />

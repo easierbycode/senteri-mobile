@@ -1,0 +1,29 @@
+<ion-view view-title="Login" align-title="left">
+    <ion-content style="background: url(img/stone-and-glass-house.jpg) center; background-size: cover;">
+        <div class="hero no-header flat">
+            <div class="content">
+                <div class="logo md-accent-bg">
+                  <img src="img/homeclub-white.png" style="height:64px; vertical-align:baseline">
+                </div>
+            </div>
+        </div>
+        
+        <form id='login-form'>
+            <div class="list">
+                <ion-md-input ng-model='userInput.phoneNumber' placeholder="Enter your phone number..." highlight-color="energized"></ion-md-input>
+            </div>
+            <div class="padding">
+                <button ng-click='onSignInSubmit()' id='login-button' class="button button-full button-assertive ink">Login</button>
+            </div>
+        </form>
+    
+        <form id='verification-code-form' style='display:none'>
+            <div class="list">
+                <ion-md-input ng-model='userInput.verificationCode' placeholder="Enter the verification code..." highlight-color="energized"></ion-md-input>
+            </div>
+            <div class="padding">
+                <button ng-click='onVerifyCodeSubmit()' id='verify-button' class="button button-full button-assertive ink">Verify Code</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

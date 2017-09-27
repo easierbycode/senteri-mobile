@@ -2,12 +2,58 @@ $base-color:                      #00120f !default;
 $calm:                            #33B8B5;
 $assertive:                       #004542;
 $positive:                        #004542;
+$energized:                       #83000a;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
+
+@import "scss/global";
+
+@import "scss/ms-widget";
+
+
+// icon button
+.button.icon-left {
+  font-family: RobotoDraft, Roboto, "Helvetica Neue", "Segoe UI", sans-serif;
+  line-height: 42px;
+}
+
+// toastr
+
+// .platform-ios, .platform-android {
+
+  .toast {
+    background-color: $light;
+  }
+
+  #toast-container .toast {
+
+    &.toast-success {
+      background-color: $positive;  //#117100;  //$balanced;
+      background-image: url(../img/logo-checkmark.png) !important;
+    }
+
+  }
+
+  .toast-error {
+    background-color: $energized;
+  }
+
+  .toast-info {
+    background-color: $positive !important;  //$calm;
+  }
+
+  .toast-warning {
+    background-color: #898300;
+  }
+
+  .toast-progress {
+    background-color: $dark;
+  }
+// }
 
 body {
   color: #00120f;
@@ -72,16 +118,237 @@ img.teal {
 }
 
 .logo {
-    width: 128px;
-    height: 128px;
-    line-height: 128px;
-    font-size: 86px;
-    font-weight: 500;
-    margin: 32px auto;
-    color: #fff;
+    width: 54px;
+    height: 54px;
+    line-height: 54px;
+    margin: 0 auto;
     border-radius: 2px;
+    padding-top: 7px;
 }
 
 .md-accent-bg {
     background-color: rgb(0,150,136);
+}
+
+#login .item-md-label {
+    margin-left: 0 !important;
+}
+
+#register-form {
+
+  a {
+    color: #a6ebe8;
+  }
+
+  label.item-checkbox {
+    color       : #fff;
+    text-shadow : 1px 1px 2px black, 0 0 5px darkgreen, 0 0 5px darkblue;
+  }
+
+  /*Solution for html*/
+  .item-checkbox .checkbox {
+    z-index: -1 !important;
+  }
+
+
+  /*Solution for the Directive*/
+  .item-content.disable-pointer-events {
+    pointer-events: initial !important
+  }
+
+  .button-light {
+    text-shadow: 1px 1px 2px black, 0 0 5px darkgreen, 0 0 5px darkblue;
+  }
+}
+
+
+#login {
+  
+  .button-light {
+    text-shadow: 1px 1px 2px black, 0 0 5px darkgreen, 0 0 5px darkblue;
+  }
+  
+  ion-content {
+    background: url("../img/stone-and-glass-house.jpg") center;
+  }
+  background-size: cover;
+
+  @media screen and (orientation:landscape) {
+    ion-content.padding {
+      padding-top: 0 !important;
+    }
+  }
+
+  .scroll-content {
+    display: table !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    form {
+      display: table-cell;
+      vertical-align: middle;
+
+      @media screen and (orientation:portrait) {
+        .header {
+          padding-bottom: 20px;
+        }
+      }
+      
+      .header {
+        // padding-bottom: 20px;
+
+        img {
+          display: block;
+          width: 80%;
+          margin: 0 auto;
+        }
+      }
+
+      .button.button-light.active, .button.button-light.activated {
+        color: #fff;
+        opacity: inherit;
+      }
+    }
+  }
+}
+
+
+// ANGULAR MATERIAL
+.flex {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.flex-45 {
+    -webkit-box-flex: 1;
+    flex: 1 1 100%;
+    max-width: 45%;
+    max-height: 100%;
+    box-sizing: border-box;
+}
+
+[layout]>* {
+    min-height: auto;
+    min-height: initial
+}
+
+.layout-align-space-between-stretch {
+  display: flex;
+  flex-direction: column;
+
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: space-between;
+}
+
+.layout-align-center-center, .layout-align-center-stretch, .layout-align-space-around-center, .layout-align-space-between-center, .layout-align-start-center {
+  display: flex;
+  flex-direction: row;
+}
+
+.layout-align-center-center {
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.layout-align-center-stretch {
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: center;
+}
+
+.layout-align-space-around-center {
+    align-items: center;
+    align-content: center;
+    justify-content: space-around;
+    max-width: 100%;
+}
+
+.layout-align-space-between-center {
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
+}
+
+.layout-align-start-center {
+  align-items: center;
+  align-content: center;
+  justify-content: flex-start;
+  max-width: 100%;
+}
+
+.layout-align-center-center>*,.layout-align-end-center>*,.layout-align-space-around-center>*,.layout-align-space-between-center>*,.layout-align-start-center>* {
+    max-width: 100%;
+    box-sizing: border-box
+}
+
+.layout-column {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column
+}
+
+
+// profile page
+#profile {
+
+  .header {
+      // background-image: url(../img/material-graphite.jpg);
+      background-image: url('../img/material-graphite.jpg');
+      
+      .avatar {
+        position: static;
+      }
+      
+      .name {
+          font-size: 34px;
+          line-height: 1.4;
+          color: #fff;
+          text-shadow: 1px 1px 2px black, 0 0 2px #006e69, 0 0 2px #00366e;
+      }
+
+      .profile-image {
+          margin-right: 24px;
+      }
+  }
+
+  .item-md-label input.used~.input-label {
+    text-shadow: 1px 1px 2px black, 0 0 2px #006e69, 0 0 2px #00366e;
+  }
+
+}
+
+// .card > .item {
+//   text-shadow: 1px 1px 2px black, 0 0 5px darkgreen, 0 0 5px darkblue;
+// }
+
+// FORM ERROR
+
+#profile {
+  .card .item.item-input input.ng-invalid {  
+    border-bottom: 2px solid red;
+  }
+
+  .dark-green-text {
+    color: #004542;
+  }
+
+  .bar .button {
+    &.button:disabled {
+      background-color: transparent;
+    }
+  }
+}
+
+
+.form-error {
+  padding: 2px 0 2px 40px;
+  color: red;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 0 3px rgba(255, 255, 255, .4);
 }

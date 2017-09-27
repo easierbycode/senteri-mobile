@@ -1,20 +1,20 @@
-<ion-view id='device-categories' view-title="Add a Device">
+<ion-view id='device-categories' hide-nav-bar="false" view-title="Verify a Device" cache-view="false">
   
-  <div class="bar bar-subheader bar-calm">
+  <!-- <div class="bar bar-subheader bar-calm">
     <h1 class='title'>
       <button class="button icon-left ion-ios-barcode-outline button-clear">
         Scan Barcode
       </button>
     </h1>
-  </div>
+  </div> -->
   
-  <ion-content class='has-subheader'>
+  <ion-content>
 
     <div class='list animate-fade-slide-in-right'>
         
         <a ng-repeat='(category, devices) in devicesByCategory' ui-sref="app.devices({ category: category })" class="item item-avatar">
           <img class='teal' ng-src="img/{{ category }}.png">
-          <h2>{{ category | capitalize }}</h2>
+          <h2>{{ category | humanize | capitalize }}</h2>
           <p>{{ deviceManufacturers( devices ) }}</p>
         </a>
 

@@ -22,14 +22,45 @@
     </ion-header-bar>
     <ion-content class='has-expanded-header'>
       <ion-list>
-        <ion-item menu-close ui-sref='app.devices'>
+        <ion-item menu-close ui-sref='app.deviceCategories'>
           Verify a Device
         </ion-item>
-        <ion-item menu-close ui-sref='app.dashboard'>
-          Dashboard
+        <ion-item menu-close ui-sref='app.profile'>
+          Profile
         </ion-item>
-        <ion-item menu-close>
+        <!-- <ion-item menu-close ui-sref='app.dashboard'>
+          Dashboard
+        </ion-item> -->
+        <!-- <ion-item ng-click='logout()' menu-close>
           Logout
+        </ion-item> -->
+        <ion-item ng-click='openStore()' menu-close>
+          Store
+        </ion-item>
+        
+        <ion-item ng-hide='checkingForUpdate' ng-click='checkForUpdate()' menu-close>
+          <div style='border-top-width: 0.55px; border-top-color: #c8c7cc; border-top-style: solid; padding-top: 16px'>
+            Check for Update
+          </div>
+        </ion-item>
+
+        <ion-item ng-show='checkingForUpdate' menu-close>
+          <div style='border-top-width: 0.55px; border-top-color: #c8c7cc; border-top-style: solid; padding-top: 16px'>
+            .. checking for update
+          </div>
+        </ion-item>
+        
+        <!-- <ion-item ng-click='openStore()' menu-close>
+          Store
+        </ion-item> -->
+        <ion-item ng-click='logout()' menu-close>
+          Logout
+        </ion-item>
+
+        <ion-item menu-close class='black-fg'>
+          <span class='secondary-text' style='font-weight:normal'>
+            v0.0.9
+          </span>
         </ion-item>
         <!-- <ion-item menu-close ng-click="BroadcastMessage( 'ooga booga' )">
           DEBUG

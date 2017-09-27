@@ -11,7 +11,8 @@
     "lodash": "^4.17.4",
     "angularfire": "^2.3.0",
     "ngCordova": "^0.1.27-alpha",
-    "ion-md-input": "^1.0.4"
+    "ion-md-input": "^1.0.4",
+    "angular-toastr": "^2.1.1"
   },
   "resolutions": {
     "angular-ui-router": "^0.3.2",

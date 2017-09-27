@@ -1,4 +1,4 @@
-<ion-view id='devices' view-title="{{ (category || 'verify a device') | capitalize }}" cache-view="false">
+<ion-view id='devices' view-title="{{ (category || 'verify a device') | humanize | capitalize }}" cache-view="false">
   <ion-content>
      <div class='list animate-fade-slide-in-right'> 
       <a ng-repeat='device in devices | filter: {category: category}' href="#/app/verify/{{ verificationPage( device ) }}" class="item item-avatar">

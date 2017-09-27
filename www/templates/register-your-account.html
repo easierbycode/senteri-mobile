@@ -1,0 +1,85 @@
+<ion-view view-title="Login" align-title="left" cache-view='false'>
+    <ion-content padding='true' style="background: url(img/stone-and-glass-house.jpg) center; background-size: cover;">
+
+        <div class="text-center">
+            <div class="logo md-accent-bg">  
+                <img src="img/logo-check-white.png" style="height:40px; width:40px" />
+            </div>
+
+             <h4 style='color:#fff'>Create your HomeClub Account</h4> 
+        </div>
+
+        <form name='registerForm' id='register-form'>
+            <div ng-hide='showAddressForm' class="list">
+                <ion-md-input ng-model='user.name.first' placeholder="First" highlight-color="energized"></ion-md-input>
+                <ion-md-input ng-model='user.name.last' placeholder="Last" highlight-color="energized"></ion-md-input>
+                <ion-md-input name='mobilePhone' ng-model='user.mobilePhone' ng-pattern='/^\(?(\d{3})\)?[ .-]?(\d{3})[ .-]?(\d{4})$/' placeholder="Mobile Phone" highlight-color="energized"></ion-md-input>
+                <div ng-show='registerForm.mobilePhone.$invalid' class="form-error">Please enter valid 10-digit #</div>
+            </div>
+            <div ng-hide='showAddressForm' class="padding">
+                <button ng-disabled="registerForm.$invalid" ng-click='showAddressForm = true' id='login-button' class="button button-full button-assertive ink">Continue</button>
+            </div>
+
+            <div id='address-form' ng-show='showAddressForm' class="list">
+                <ion-md-input ng-model='user.address.houseNumber' placeholder="House number" highlight-color="energized"></ion-md-input>
+                <ion-md-input ng-model='user.address.streetName' placeholder="Street name" highlight-color="energized"></ion-md-input>
+                <ion-md-input ng-model='user.address.city' placeholder="City" highlight-color="energized"></ion-md-input>
+                <!-- <ion-md-input ng-model='user.address.state' placeholder="State" highlight-color="energized"></ion-md-input> -->
+
+                <label class='item item-input item-select' style='margin-top:30px'>
+
+                    <div class='input-label' style='
+                        color: #fff;
+                        opacity: 0.7;
+                        text-transform: uppercase;
+                        font-weight: 700;
+                        letter-spacing: .25rem
+                    '>
+                        State
+                    </div>
+
+                    <select ng-model='userDetails.address.state' ng-options='abbr as state for (abbr , state) in states' style='
+                        background-color: rgba(0,0,0,0.6);
+                        color: #fff;
+                        opacity: 0.7;
+                        text-transform: uppercase;
+                        letter-spacing: .25rem
+                    '>
+                        
+                    </select>
+
+                </label>
+
+                <ion-md-input name='zip' ng-model='user.address.zip' ng-minlength='5' ng-maxlength='5' placeholder="ZIP" highlight-color="energized"></ion-md-input>
+                
+                <div ng-show='registerForm.zip.$invalid' class="form-error">Please enter valid ZIP</div>
+                
+                
+                <ion-item class="item-checkbox button-light" style='color:#fff'>
+                    <!-- <ion-checkbox ng-model="user.acceptedTerms">
+                        I agree to <a href='https://homeclub.us/17264631/policies/38419855.html'>HomeClub Terms</a> and <a href='https://homeclub.us/17264631/policies/38419791.html'>Privacy</a>
+                    </ion-checkbox> -->
+                    <!-- <ion-checkbox class="item-button-right">
+                        item
+
+                        <button class="button" stop-event ng-click="click()">the licence</button>
+
+                    </ion-checkbox> -->
+
+                    <!-- <li class="item item-checkbox"> -->
+                        <div  class="checkbox">
+                            <input type="checkbox">
+                        </div>
+                        I accept
+                        <a href="" stop-event ng-click="openTerms()">HomeClub Terms</a>
+                        and
+                        <a href="" stop-event ng-click="openPrivacy()">Privacy</a>
+                    <!-- </li> -->
+                </ion-item>
+            </div>
+            <div ng-show='showAddressForm' class="padding">
+                <button ng-disabled="registerForm.$invalid" ng-click='updateFirebaseProfile()' id='login-button' class="button button-full button-assertive ink">Continue</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

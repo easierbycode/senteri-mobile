@@ -1,0 +1,108 @@
+<ion-view id="profile" hide-nav-bar="true" cache-view="false">
+    <!-- <ion-content> -->
+        
+        
+        <ion-tabs class="tabs-positive tabs-icon-top tabs-bottom">
+
+            <ion-tab title="Contact" icon-on="ion-ios-world" icon-off="ion-ios-world">
+                 <ion-scroll scrollY="true"> 
+                <!-- Tab 1 content -->
+                <div class='page-layout simple tabbed' style='background-color:#f5f5f5'>
+
+                    
+                     <div class="bar bar-header bar-clear" style='box-shadow:none'>
+                         <button ng-click='cancel()' class="button button-clear">
+                            <i class="icon ion-close"></i>
+                         </button>
+                         
+                         <button ng-click='save()' class="button button-clear">
+                            <i class="icon ion-checkmark"></i>
+                         </button>
+                    </div>
+        
+                      <div class='header layout-align-center-center layout-column'>
+                        <div class='user-info layout-align-center-center layout-column'>
+                            <img class='profile-image avatar huge' src='img/profile.jpg'>
+
+                            <div class='name'>
+                                {{ userDetails.name.first }} {{ userDetails.name.last }}
+                            </div>
+
+                            <div class='white-text'>
+                                {{ user.email }}
+                            </div>
+                        </div>
+                    </div>   
+
+                    <div class='content flex'>  
+
+                        <div class='card' style='background-color:#f5f5f5; box-shadow: none;'>
+                            <ion-md-input ng-model='userDetails.name.first' placeholder="First name" highlight-color="energized"></ion-md-input>
+
+                            <ion-md-input ng-model='userDetails.name.last' placeholder="Last name" highlight-color="energized"></ion-md-input>
+                            
+                            <!-- <ion-md-input ng-model='user.email' placeholder="Email" highlight-color="energized"></ion-md-input> -->
+
+                            <ion-md-input ng-model='user.phoneNumber' placeholder="Phone" highlight-color="energized"></ion-md-input>
+                        </div>
+
+                    </div>
+
+                </div>
+                 </ion-scroll> 
+            </ion-tab>
+
+            <ion-tab title="Address" icon-on="ion-home" icon-off="ion-home">
+                 <ion-scroll scrollY="true" style='margin-bottom: 200px; padding-bottom: 200px;'> 
+                <!-- Tab 2 content -->
+                <div class='page-layout simple tabbed' style='background-color:#f5f5f5'>
+
+                    <div class="bar bar-header bar-clear" style='box-shadow:none'>
+                         <button ng-click='cancel()' class="button button-clear">
+                            <i class="icon ion-close"></i>
+                         </button>
+                         
+                         <button ng-click='save()' class="button button-clear">
+                            <i class="icon ion-checkmark"></i>
+                         </button>
+                    </div>
+        
+                    <div class='header layout-gt-sm-row layout-align-gt-sm-space-between-end layout-align-center-center layout-column'>
+                        <div class='user-info layout-gt-sm-row layout-align-gt-sm-start-center layout-align-center-center layout-column'>
+                            <img class='profile-image avatar huge' src='img/profile.jpg'>
+
+                            <div class='name'>
+                                {{ userDetails.name.first }} {{ userDetails.name.last }}
+                            </div>
+
+                            <div class='white-text'>
+                                {{ user.email }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='content flex'>  
+
+                        <div class='card' style='background-color:transparent; box-shadow: none;'>
+                            <ion-md-input ng-model='userDetails.address.houseNumber' placeholder="House number" highlight-color="energized"></ion-md-input>
+
+                            <ion-md-input ng-model='userDetails.address.streetName' placeholder="Street name" highlight-color="energized"></ion-md-input>
+                            
+                            <ion-md-input ng-model='userDetails.address.city' placeholder="City" highlight-color="energized"></ion-md-input>
+
+                            <ion-md-input ng-model='userDetails.address.state' placeholder="State" highlight-color="energized"></ion-md-input>
+
+                            <ion-md-input ng-model='userDetails.address.zip' placeholder="ZIP" highlight-color="energized"></ion-md-input>
+                        </div> 
+
+                    </div>
+
+                </div>
+                 </ion-scroll> 
+            </ion-tab>
+
+        </ion-tabs>
+
+
+    <!-- </ion-content> -->
+ </ion-view> 

@@ -1,29 +1,51 @@
-<ion-view view-title="Login" align-title="left">
-    <ion-content style="background: url(img/stone-and-glass-house.jpg) center; background-size: cover;">
-        <div class="hero no-header flat">
-            <div class="content">
-                <div class="logo md-accent-bg">
-                  <img src="img/homeclub-white.png" style="height:64px; vertical-align:baseline">
+<ion-view id="login" hide-nav-bar="true" cache-view="false">
+    <ion-content padding="true" scroll="false">
+        <!-- <form> -->
+            <div class="row responsive-md">
+                <div class="col col-50 col-offset-25">
+
+                    <div class="text-center">
+                          <div class="logo md-accent-bg">  
+                            <img src="img/logo-check-white.png" style="height:40px; width:40px" />
+                          </div>  
+                    </div>
+
+                    <!-- <form> -->
+                        <div class="list">
+                            <ion-md-input ng-model='user.email' placeholder="Enter your email" highlight-color="energized"></ion-md-input>
+                            <ion-md-input ng-model='user.password' placeholder="Enter your password" highlight-color="energized"></ion-md-input>
+                        </div>
+
+                        <button ng-click='onSubmit()' ng-hide='createAccount == true' type='submit' class="button button-block button-positive">
+                            Log In
+                        </button>
+
+                        <button ng-click='createUser()' ng-show='createAccount == true' type='submit' class="button button-block button-positive">
+                            Create Account
+                        </button>
+                    <!-- </form> -->
+
+                    <div class="row row-no-padding">
+                        <div class="col">
+                            <button ng-click='sendPasswordReset()' class="button button-clear button-light">
+                                Forgot password?
+                            </button>
+                        </div>
+
+                        <div ng-hide='createAccount == true' class="col text-right">
+                            <button ng-click='createAccount =  true' class="button button-clear button-light">
+                                Sign up
+                            </button>
+                        </div>
+
+                        <div ng-show='createAccount == true' class="col text-right">
+                            <button ng-click='createAccount =  false' class="button button-clear button-light">
+                                Sign in
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <form id='login-form'>
-            <div class="list">
-                <ion-md-input ng-model='userInput.phoneNumber' placeholder="Enter your phone number..." highlight-color="energized"></ion-md-input>
-            </div>
-            <div class="padding">
-                <button ng-click='onSignInSubmit()' id='login-button' class="button button-full button-assertive ink">Login</button>
-            </div>
-        </form>
-    
-        <form id='verification-code-form' style='display:none'>
-            <div class="list">
-                <ion-md-input ng-model='userInput.verificationCode' placeholder="Enter the verification code..." highlight-color="energized"></ion-md-input>
-            </div>
-            <div class="padding">
-                <button ng-click='onVerifyCodeSubmit()' id='verify-button' class="button button-full button-assertive ink">Verify Code</button>
-            </div>
-        </form>
+        <!-- </form> -->
     </ion-content>
 </ion-view>

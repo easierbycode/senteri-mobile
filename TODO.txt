@@ -1,4 +1,10 @@
 NOW
 ===
+- test pushing ionic deploy update
+- get icon for "unknown device"
+
+
+LATER
+=====
 - try sending push message via web to Firebase token:
 fCNStdO5gQI:APA91bFenWC8-GrYP86etjQ7KEg5v26uErFhrC6mrDI4hji7nJjowv0-Y-Ooy702PQl98Mk33fcvjvhW2NQ8G4krdrooqlBq5rGtarJXsYORHEjknsPttaP6sbw-MCaS8bRThCH9s6ih

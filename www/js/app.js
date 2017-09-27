@@ -3,7 +3,7 @@
 
 // TODO: remove this temp hack once login is in place
 var currentUser = {
-  _id: '-=DEBUG_USER=-'
+  uid: '-=DEBUG_USER=-'
 };
 
 var nestClientId      = "829579eb-682c-4e44-b69b-d40df3ad9ab2";
@@ -11,7 +11,35 @@ var nestClientSecret  = "OvjjBj81jV8JFSTE5swkhXjwA";
 
 var rootRef  = firebase.database().ref();
 
-angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material', 'ionMdInput', 'ngCordova', 'ui.router'])
+function getBase64ImageFromInput(input, callback) {
+  window.resolveLocalFileSystemURL(input, function(fileEntry) {
+      fileEntry.file(function(file) {
+              var reader = new FileReader();
+              reader.onloadend = function(evt) {
+                  callback(null, evt.target.result);
+              };
+              reader.readAsDataURL(file);
+          },
+          function() {
+              callback('failed', null);
+          });
+  },
+  function() {
+      callback('failed', null);
+  });
+}
+
+
+angular.module('starter', [
+  'firebase',
+  'ionic',
+  'ionic.cloud',
+  'ionic-material',
+  'ionMdInput',
+  'ngCordova',
+  'toastr',
+  'ui.router'
+])
 
 
 .run(function($ionicPlatform) {
@@ -33,8 +61,76 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 })
 
 
-.controller( 'AppCtrl', function( $ionicDeploy, $ionicPlatform, $ionicPopup, $scope ) {
+.factory('LatestGpsCoordinates', function() {
+  
+  var position = {};
+  
+  return {
+    get: function() { return position.coords },
+    set: function( coords ) { position.coords = {
+      latitude: coords.latitude,
+      longitude: coords.longitude
+    } }
+  };
+  
+})
 
+
+.factory('SessionFactory', function($window, $ionicPlatform, $timeout) {
+    var _sessionFactory;
+    _sessionFactory = {};
+    _sessionFactory.createSession = function(user) {
+      return $window.localStorage.user = JSON.stringify(user);
+    };
+    _sessionFactory.getSession = function() {
+      var user  = $window.localStorage.user;
+      return user && JSON.parse( user ) || undefined;
+    };
+    _sessionFactory.deleteSession = function() {
+      delete $window.localStorage.user;
+      return true;
+    };
+    _sessionFactory.checkSession = function() {
+      if ($window.localStorage.user) {
+        return true;
+      }
+      return false;
+    };
+    return _sessionFactory;
+  })
+
+
+.directive('stopEvent', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attr) {
+      element.bind('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+  };
+})
+
+
+.controller( 'AppCtrl', function(
+  $cordovaGeolocation,
+  $cordovaInAppBrowser,
+  $firebaseAuth,
+  $ionicDeploy,
+  $ionicPlatform,
+  $ionicPopup,
+  $scope,
+  $state,
+  LatestGpsCoordinates,
+  SessionFactory,
+  toastr
+) {
+
+  // get GPS location on app start
+  $cordovaGeolocation.getCurrentPosition({}).then(function(position){
+    LatestGpsCoordinates.set( position.coords );
+  },function( err ){ console.log( err ) });
+  
   var Datagram;
   var socket;
   
@@ -71,55 +167,113 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
     socket.send( text, '230.185.192.108', 25000 );
   }
   
-  $scope.clearFabs = function() {
-      var fabs = document.getElementsByClassName('button-fab');
-      if (fabs.length && fabs.length > 1) {
-          fabs[0].remove();
-      }
-  }
+  // $scope.clearFabs = function() {
+  //     var fabs = document.getElementsByClassName('button-fab');
+  //     if (fabs.length && fabs.length > 1) {
+  //         fabs[0].remove();
+  //     }
+  // }
   
   $scope.hideHeader = function() {
       $scope.hideNavBar();
       $scope.noHeader();
   }
+    
+  $scope.showHeader = function() {
+      $scope.showNavBar();
+      $scope.addHeader();
+  }
   
   $scope.hideNavBar = function() {
-      document.getElementsByTagName('ion-nav-bar')[0].style.display = 'none';
+    document.getElementsByTagName('ion-nav-bar')[0].style.display = 'none';
+  }
+    
+  $scope.showNavBar = function() {
+    document.getElementsByTagName('ion-nav-bar')[0].style.display = 'block';
   }
 
+  $scope.logout   = function() {
+
+    $firebaseAuth().$signOut().then(() => {
+      // delete persisted user from localStorage
+      SessionFactory.deleteSession();
+
+      // TODO: hook this into event listener
+      $state.go( 'app.login' );
+    })
+  }
+
+  var options = {
+      location    : 'no',
+      clearcache  : 'yes',
+      toolbar     : 'no'
+    };
+
+  $scope.openStore  = function() {
+    $cordovaInAppBrowser.open( 'https://homeclub.us', '_blank', options );
+  }
+   
   $scope.noHeader = function() {
       var content = document.getElementsByTagName('ion-content');
       for (var i = 0; i < content.length; i++) {
-          if (content[i].classList.contains('has-header')) {
-              content[i].classList.toggle('has-header');
+          if ( content[i].classList.contains('has-header') ) {
+              content[i].classList.toggle( 'has-header' );
+          }
+      }
+    }
+    
+  $scope.addHeader = function() {
+      var content = document.getElementsByTagName('ion-content');
+      for (var i = 0; i < content.length; i++) {
+          if ( !content[i].classList.contains('has-header') ) {
+              content[i].classList.toggle( 'has-header' );
           }
       }
   }
 
-  $ionicDeploy.check().then(function(snapshotAvailable) {
-    if (snapshotAvailable) {
-      // When snapshotAvailable is true, you can apply the snapshot
-      $ionicDeploy.download().then(() => {
-        return $ionicDeploy.extract().then(() => {
-          $ionicPopup.show({
-            title: 'Update complete',
-            subTitle: 'Restart app now?',
-            buttons: [
-              {
-                text: '<b>Now</b>',
-                type: 'button-assertive',
-                onTap: () => {
-                  // restart app
-                  $ionicDeploy.load();
-                }
-              },
-              { text: 'Later' }
-            ]
-          });
-        })
-      });
-    }
-  });
+  $scope.checkingForUpdate  = false;
+  
+  $scope.checkForUpdate = function( suppressInitialAlert ) {
+
+    // console.log( 'CHECKING FOR UPDATE' );
+    if ( !suppressInitialAlert )  toastr.info( '', 'Checking for update' );
+
+    $scope.checkingForUpdate  = true;
+
+    $ionicDeploy.check().then(function(snapshotAvailable) {
+
+      $scope.checkingForUpdate  = false;
+
+      if (snapshotAvailable) {
+        toastr.info( '.. downloading update' );
+        // When snapshotAvailable is true, you can apply the snapshot
+        $ionicDeploy.download().then(() => {
+          return $ionicDeploy.extract().then(() => {
+            $ionicPopup.show({
+              title: 'Update complete',
+              subTitle: 'Restart app now?',
+              buttons: [
+                {
+                  text: '<b>Now</b>',
+                  type: 'button-assertive',
+                  onTap: () => {
+                    // restart app
+                    $ionicDeploy.load();
+                  }
+                },
+                { text: 'Later' }
+              ]
+            });
+          })
+        });
+      } else {
+        toastr.warning( '.. no update available' );
+      }
+    });
+  }
+
+  $scope.checkForUpdate( true );
+
 })
 
 
@@ -137,11 +291,21 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 })
 
 
-.controller( 'DeviceCategoriesCtrl', function( $firebaseArray, $scope, $timeout, ionicMaterialMotion ) {
+.controller( 'DeviceCategoriesCtrl', function(
+  $firebaseArray,
+  $ionicSideMenuDelegate,
+  $scope,
+  $timeout,
+  ionicMaterialMotion
+) {
+  
+  $ionicSideMenuDelegate.canDragContent( true );
   
   $scope.devices            = $firebaseArray( rootRef.child( 'devices' ).orderByChild( 'category' ) );
   
   $scope.devices.$loaded().then(function() {
+    // $scope.$parent.showHeader();
+
     $scope.devicesByCategory  = _.groupBy( $scope.devices, 'category' );
 
     $timeout(function() {
@@ -151,7 +315,7 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 
   $scope.deviceManufacturers  = function( devices ) {
     return _.uniq( devices.map( d => d.manufacturer ) ).join( ', ' );
-  }
+  } 
 })
 
 
@@ -168,85 +332,422 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
   })
 
   $scope.verificationPage = function ( device ) {
-    return [ device.manufacturer, device.title ].join( '-' ).replace( /\s/g, '-' ).toLowerCase();
+    return  device.verifyPage ||
+            [ device.manufacturer, device.title ].join( '-' ).replace( /\s|\//g, '-' ).toLowerCase();
   }
 })
 
 
-.controller('LoginCtrl', function( $ionicHistory, $scope, $timeout, $state, $stateParams, ionicMaterialInk ) {
-    
+.controller('LoginCtrl', function(
+  $cordovaInAppBrowser,
+  $firebaseAuth,
+  $firebaseObject,
+  $ionicHistory,
+  $ionicPopup,
+  $ionicSideMenuDelegate,
+  $scope,
+  $timeout,
+  $state,
+  SessionFactory,
+  toastr
+) {
+
     $ionicHistory.nextViewOptions({
-        historyRoot: true
-    });
-    
-    $scope.userInput  = {};
-    
-    $scope.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('login-button', {
-      'size': 'invisible',
-      'callback': function(response) {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-        $scope.onSignInSubmit();
-      }
+      disableBack: true
     });
 
-    $scope.recaptchaVerifier.render().then(function(widgetId) {
-      $scope.recaptchaWidgetId = widgetId;
-    });
+    $scope.states   = {
+      "AL": "Alabama",
+      "AK": "Alaska",
+      "AZ": "Arizona",
+      "AR": "Arkansas",
+      "CA": "California",
+      "CO": "Colorado",
+      "CT": "Connecticut",
+      "DE": "Delaware",
+      "DC": "District Of Columbia",
+      "FL": "Florida",
+      "GA": "Georgia",
+      "HI": "Hawaii",
+      "ID": "Idaho",
+      "IL": "Illinois",
+      "IN": "Indiana",
+      "IA": "Iowa",
+      "KS": "Kansas",
+      "KY": "Kentucky",
+      "LA": "Louisiana",
+      "ME": "Maine",
+      "MD": "Maryland",
+      "MA": "Massachusetts",
+      "MI": "Michigan",
+      "MN": "Minnesota",
+      "MS": "Mississippi",
+      "MO": "Missouri",
+      "MT": "Montana",
+      "NE": "Nebraska",
+      "NV": "Nevada",
+      "NH": "New Hampshire",
+      "NJ": "New Jersey",
+      "NM": "New Mexico",
+      "NY": "New York",
+      "NC": "North Carolina",
+      "ND": "North Dakota",
+      "OH": "Ohio",
+      "OK": "Oklahoma",
+      "OR": "Oregon",
+      "PW": "Palau",
+      "PA": "Pennsylvania",
+      "RI": "Rhode Island",
+      "SC": "South Carolina",
+      "SD": "South Dakota",
+      "TN": "Tennessee",
+      "TX": "Texas",
+      "UT": "Utah",
+      "VT": "Vermont",
+      "VA": "Virginia",
+      "WA": "Washington",
+      "WV": "West Virginia",
+      "WI": "Wisconsin",
+      "WY": "Wyoming"
+  }
 
-    $scope.onSignInSubmit = function() {
-
-      console.log( '.. onSignInSubmit' );
-
-      firebase.auth().signInWithPhoneNumber( $scope.userInput.phoneNumber, $scope.recaptchaVerifier )
-        .then(function( confirmationResult ) {
-          $scope.confirmationResult = confirmationResult;
-
-          document.getElementById( 'login-form' ).style.display = 'none';
-          document.getElementById( 'verification-code-form' ).style.display = 'block';
-        })
-
-      // console.log( $scope.userInput.phoneNumber );
-
-      // window.FirebasePlugin.verifyPhoneNumber( $scope.userInput.phoneNumber, 0, function( credential ) {
-      //   console.log( 'verifyPhoneNumber COMPLETE' );
-      //   console.log( credential );
-      //   $scope.verificationId = credential.verificationId;
-
-      //   document.getElementById( 'login-form' ).style.display = 'none';
-      //   document.getElementById( 'verification-code-form' ).style.display = 'block';
-      // }, function( err ) {
-      //   console.log( 'BOOM' );
-      //   console.log( err );
-      // });
-    }
-    
-    $scope.onVerifyCodeSubmit = function() {
-      $scope.confirmationResult.confirm( $scope.userInput.verificationCode ).then(function( result ) {
-        $state.go( 'app.devices' );
-        document.getElementsByTagName('ion-nav-bar')[0].style.display = 'block';
-      })
-      // var signInCredential = firebase.auth.PhoneAuthProvider.credential(
-      //   $scope.verificationId,
-      //   $scope.userInput.verificationCode
-      // );
-      
-      // firebase.auth().signInWithCredential( signInCredential )
-      //   .then(function( credential ) {
-      //     console.log( credential );
-      //     $state.go( 'app.devices' );
-      //     document.getElementsByTagName('ion-nav-bar')[0].style.display = 'block';
-      //   })
-    }
-
-    $scope.$parent.clearFabs();
-    $timeout(function() {
+    $scope.$on('$ionicView.enter', function () {
+      $timeout(function() {
         $scope.$parent.hideHeader();
-    }, 0);
-    ionicMaterialInk.displayEffect();
+      }, 13);
+    });
+
+    $scope.$on('$ionicView.unloaded', function () {
+      $scope.$parent.showHeader();
+    });
+    
+    var loggedInUser  = SessionFactory.getSession();
+    
+    // if user already logged in skip to device categories page
+    if ( loggedInUser ) {
+      currentUser = loggedInUser;
+
+      $scope.currentUserMeta = $firebaseObject( rootRef.child( 'users' ).child( currentUser.uid ) );
+
+      // wait till user meta is loaded
+      // then show welcome back toast
+      $scope.currentUserMeta.$loaded().then(function( data ) {
+        $state.go( 'app.deviceCategories' );
+        var name  = $scope.currentUserMeta.name && $scope.currentUserMeta.name.first || ''
+        toastr.info( 'Welcome back ' + name );
+      })
+    }
+
+    var options = {
+      location    : 'no',
+      clearcache  : 'yes',
+      toolbar     : 'no'
+    };
+
+    $scope.openPrivacy  = function() {
+      $cordovaInAppBrowser.open( 'https://homeclub.us/17264631/policies/38419791.html', '_blank', options );
+    };
+    
+    $scope.openTerms  = function() {
+      $cordovaInAppBrowser.open( 'https://homeclub.us/17264631/policies/38419855.html', '_blank', options );
+    };
+    
+    $ionicSideMenuDelegate.canDragContent( false );
+    
+    $scope.user     = {};
+
+    $scope.sendPasswordReset      = function() {
+      
+      if ( !$scope.user.email )  return $ionicPopup.alert( { title: 'Enter email first' } );
+      
+      let errorMessage  = {
+        title     : 'Invalid email',
+        subTitle  : 'Please verify your email'
+      }
+      
+      let successMessage  = {
+        title     : 'Password reset sent!',
+        subTitle  : 'Please check your email'
+      }
+
+      $firebaseAuth().$sendPasswordResetEmail( $scope.user.email )
+        .then(() => $ionicPopup.alert( successMessage ))
+        .catch(( err ) => {
+          $ionicPopup.alert( errorMessage );
+        });
+
+    }
+
+    $scope.updateFirebaseProfile  = function() {
+
+      rootRef.child( 'users' )
+            .child( currentUser.uid )
+            .update( $scope.user )
+            .then(() => {
+              currentUser = _.extend( currentUser, $scope.user );
+
+              // persist currentUser (till logout)
+              SessionFactory.createSession( currentUser );
+
+              $state.go( 'app.deviceCategories' );
+            });
+
+    }
+    
+    $scope.onSubmit = function() {
+      $firebaseAuth().$signInWithEmailAndPassword(
+        $scope.user.email,
+        $scope.user.password
+      )
+        .then(( user ) => {
+          currentUser = user.toJSON();
+
+          // persist currentUser (till logout)
+          SessionFactory.createSession( currentUser );
+
+          $state.go( 'app.deviceCategories' );
+        }, function( err ) {
+          toastr.warning( err.message );
+        });
+    };
+
+    $scope.createUser  = function() {
+      $firebaseAuth().$createUserWithEmailAndPassword(
+        $scope.user.email,
+        $scope.user.password
+      ).then(( user ) => {
+
+        // login user then navigate to create your account page
+        $firebaseAuth().$signInWithEmailAndPassword(
+          $scope.user.email,
+          $scope.user.password
+        )
+          .then(( user ) => {
+            currentUser = user.toJSON();
+
+            // * DONT create session or profile page
+            // - which uses LoginCtrl will auto-bypass the profile page
+            // SessionFactory.createSession( currentUser );
+
+            $state.go( 'app.register' );
+          });
+
+      }, function ( error ){
+        console.log( error );
+        toastr.warning( error.message );
+      })
+    };
+
+    // $timeout(function() {
+    //     $scope.$parent.hideHeader();
+    // }, 0);
 })
 
 
-.controller('VerifyHueCtrl', function($scope, $http, $window) {
+.controller('ProfileCtrl', function(
+  $ionicHistory,
+  $scope,
+  $state,
+  $timeout,
+  SessionFactory,
+  toastr
+) {
+
+  $ionicHistory.nextViewOptions({
+    disableBack: true
+  });
+
+  $scope.states   = {
+      "AL": "Alabama",
+      "AK": "Alaska",
+      "AZ": "Arizona",
+      "AR": "Arkansas",
+      "CA": "California",
+      "CO": "Colorado",
+      "CT": "Connecticut",
+      "DE": "Delaware",
+      "DC": "District Of Columbia",
+      "FL": "Florida",
+      "GA": "Georgia",
+      "HI": "Hawaii",
+      "ID": "Idaho",
+      "IL": "Illinois",
+      "IN": "Indiana",
+      "IA": "Iowa",
+      "KS": "Kansas",
+      "KY": "Kentucky",
+      "LA": "Louisiana",
+      "ME": "Maine",
+      "MD": "Maryland",
+      "MA": "Massachusetts",
+      "MI": "Michigan",
+      "MN": "Minnesota",
+      "MS": "Mississippi",
+      "MO": "Missouri",
+      "MT": "Montana",
+      "NE": "Nebraska",
+      "NV": "Nevada",
+      "NH": "New Hampshire",
+      "NJ": "New Jersey",
+      "NM": "New Mexico",
+      "NY": "New York",
+      "NC": "North Carolina",
+      "ND": "North Dakota",
+      "OH": "Ohio",
+      "OK": "Oklahoma",
+      "OR": "Oregon",
+      "PW": "Palau",
+      "PA": "Pennsylvania",
+      "RI": "Rhode Island",
+      "SC": "South Carolina",
+      "SD": "South Dakota",
+      "TN": "Tennessee",
+      "TX": "Texas",
+      "UT": "Utah",
+      "VT": "Vermont",
+      "VA": "Virginia",
+      "WA": "Washington",
+      "WV": "West Virginia",
+      "WI": "Wisconsin",
+      "WY": "Wyoming"
+  }
+
+  // window.addEventListener('native.keyboardshow', keyboardShowHandler);
+
+  // function keyboardShowHandler(e){
+  //     alert('Keyboard height is: ' + e.keyboardHeight);
+  // }
+  
+  $scope.$parent.hideHeader();
+  
+  // TODO: on view leave showHeader()
+  $scope.$on('$ionicView.unloaded', function () {
+    $scope.$parent.showHeader();
+  });
+
+  $scope.user = SessionFactory.getSession();
+
+  console.log( $scope.user );
+
+  // $scope.userDetails  = rootRef.child( 'users' )
+  //           .child( currentUser.uid );
+  $scope.userDetailsRef   = rootRef.child( 'users' )
+            .child( $scope.user.uid );
+    
+  // $scope.userDetails    = $firebaseObject( $scope.userDetailsRef );
+  $scope.userDetails    = {
+    name: {
+      first : 'First name',
+      last  : 'Last name'
+    }
+  };
+
+
+  $scope.userDetailsRef.once('value', function( snapshot ) {
+    let userDetails = snapshot.val();
+
+    if ( userDetails.name !== null ) {
+      $scope.userDetails    = userDetails;
+    }
+  })
+
+  $scope.cancel = function() {
+    $state.go( 'app.deviceCategories' );
+  }
+  
+  $scope.save = function() {
+
+    $scope.userDetailsRef.update(
+      $scope.userDetails,
+      () => {
+        let originalUser  = SessionFactory.getSession();
+
+        let firebaseProfileUpdate = {};
+
+        // email has to be updated by specific firebase method
+        // if ( $scope.user.email != originalUser.email )  firebaseProfileUpdate.email = $scope.user.email;
+
+        if ( $scope.user.phoneNumber != originalUser.phoneNumber )  firebaseProfileUpdate.phoneNumber = $scope.user.phoneNumber;
+
+        if ( Object.keys( firebaseProfileUpdate ).length ) {
+          var user = firebase.auth().currentUser;
+
+          user.updateProfile( firebaseProfileUpdate ).then(function() {
+            // save changes to SessionFactory (localstorage)
+            let updatedUser = angular.extend( originalUser, firebaseProfileUpdate );
+            SessionFactory.createSession( updatedUser );
+
+            // Update successful.
+            toastr.success( '', 'Saved!' );
+            $state.go( 'app.deviceCategories' );
+          }).catch(function(error) {
+            // An error happened.
+          });
+        } else {
+          toastr.success( '', 'Saved!' );
+          $state.go( 'app.deviceCategories' );
+        }
+      }
+    )
+  }
+
+})
+
+
+
+.controller('VerifyUnknownDeviceCtrl', function( $cordovaCapture, $stateParams, $scope, LatestGpsCoordinates ) {
+
+  $scope.deviceTitle  = $stateParams.deviceTitle
+    .replace( /^\w*-/, '' )
+    .replace( /-/g, ' ' );
+
+  $scope.takePicture  = function() {
+    $cordovaCapture.captureImage().then(function( imageData ) {
+      getBase64ImageFromInput(
+        imageData[0].fullPath,
+        function( err, base64Img ) {
+          
+          var verificationData  = {
+            evidencePhoto : base64Img,
+            verifyDate    : new Date().getTime()
+          }
+
+          if (LatestGpsCoordinates.get())  verificationData.verifiedFromGpsPosition = LatestGpsCoordinates.get();
+          
+          rootRef.child( 'verifiedThirdPartyDevices' )
+            .child( currentUser.uid )
+            .child( $scope.deviceTitle.replace( /\s/g, '-' ) )
+            .update( verificationData );
+          
+          storageRef
+            .child( 'verifiedThirdPartyDevices' )
+            .child( currentUser.uid )
+            .child( $stateParams.deviceTitle + '.' + imageData[0].name.split( '.' )[1] )
+            .putString( base64Img, 'data_url' ).then(function( snapshot ) {
+              console.log('Uploaded a data_url string!');
+            });
+
+            // TODO: after storageRef putString callback success toast
+        },
+        function( err ) {}
+      );
+      
+    }, function( err ) {
+      // An error occurred. Show a message to the user
+    });
+  }
+  
+})
+
+
+.controller('VerifyHueCtrl', function(
+  $scope,
+  $http,
+  $state,
+  $window,
+  LatestGpsCoordinates,
+  toastr
+) {
 
   $scope.findBridge = function() {
     $http.get('https://www.meethue.com/api/nupnp', {}).then(function(resp){
@@ -260,19 +761,31 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
           
           if ( hueResp.data[0] && hueResp.data[0].error ) {
             var errorText = hueResp.data[0].error.description;
-            return alert( errorText );
+            var errorText = errorText.charAt(0).toUpperCase() + errorText.substr(1).toLowerCase();
+            // return alert( errorText );
+            return toastr.warning( errorText );
           }
           
           if ( hueResp.data[0] && hueResp.data[0].success ) {
             var hueUsername = hueResp.data[0].success.username;
             
             $http.get(hueInternalApiUrl+hueUsername, {}).then(function( fullStateResp ) {
-              alert( 'Found ' + Object.keys(fullStateResp.data.lights).length + ' lights with ' + Object.keys( fullStateResp.data.schedules ).length + ' schedules');
+              
+              let successTitle    = 'Verified!';
+              let successText     = 'Found ' + Object.keys(fullStateResp.data.lights).length + ' lights with ' + Object.keys( fullStateResp.data.schedules ).length + ' schedules';
+              
+              // alert( successText );
               
               fullStateResp.data.verifyDate = new Date().getTime();
-              // if (LatestGpsCoordinates.get())  fullStateResp.data.verifiedFromGpsPosition = LatestGpsCoordinates.get();
+              if (LatestGpsCoordinates.get())  fullStateResp.data.verifiedFromGpsPosition = LatestGpsCoordinates.get();
               
-              rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser._id ).update( { phillipsHue: fullStateResp.data } );
+              rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser.uid ).update(
+                { 'philips-hue': fullStateResp.data },
+                () => {
+                  toastr.success( successText, successTitle );
+                  $state.go( 'app.deviceCategories' );
+                }
+              );
             })
           }
         })
@@ -284,7 +797,15 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 })
 
 
-.controller( 'VerifyNestCtrl', function( $cordovaInAppBrowser, $http, $ionicPopup, $location, $rootScope, $scope ) {
+.controller( 'VerifyNestCtrl', function(
+  $cordovaInAppBrowser,
+  $http,
+  $ionicPopup,
+  $location,
+  $rootScope,
+  $scope,
+  LatestGpsCoordinates
+) {
   
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   
@@ -309,14 +830,18 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
                       var ref = new Firebase( 'wss://developer-api.nest.com' );
                       ref.auth( accessToken );
                       ref.on('value', function( snapshot ) {
+                        
                         var nestData = {
                           devices     : snapshot.val().devices,
                           verifyDate  : new Date().getTime()
                         }
                         
-                        // if (LatestGpsCoordinates.get())  nestData.verifiedFromGpsPosition = LatestGpsCoordinates.get();
+                        if (LatestGpsCoordinates.get())  nestData.verifiedFromGpsPosition = LatestGpsCoordinates.get();
                         
-                        rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser._id ).update( { nest: nestData } );
+                        rootRef.child( 'verifiedThirdPartyDevices' ).child( currentUser.uid ).update(
+                          { nest: nestData },
+                          () => toastr.success( '', 'Verified!' )
+                        );
 
                         $ionicPopup.alert({
                           title: 'Nest devices verified!'
@@ -346,13 +871,28 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
 
 .filter('capitalize', function() {
     return function(input) {
-      return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+      // return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+      return (!!input) ? input.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()}) : '';
     }
 })
 
 
-.config(function( $ionicCloudProvider, $stateProvider, $urlRouterProvider ) {
+.filter('humanize', function() {
+    return function( input ) {
+      return (!!input) ? input.replace( /_/g, ' ' ) : '';
+    }
+})
 
+
+.config(function(
+  $ionicCloudProvider,
+  $ionicConfigProvider,
+  $stateProvider,
+  $urlRouterProvider
+) {
+  
+  $ionicConfigProvider.tabs.position( 'bottom' );
+  
   $ionicCloudProvider.init({
     "core": {
       "app_id": "eca18764"
@@ -374,6 +914,26 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
       'menuContent': {
         templateUrl: 'templates/dashboard.html',
         controller: 'DashboardCtrl'
+      }
+    }
+  })
+
+  .state('app.verifyEcho', {
+    url: '/verify/amazon-echo',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/verify/amazon-echo.html'//,
+        // controller: 'VerifyNestCtrl'
+      }
+    }
+  })
+
+  .state('app.verifyLeeo', {
+    url: '/verify/leeo-leeo-smart-alert-smoke-co-remote-alarm-monitor',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/verify/leeo-leeo-smart-alert-smoke-co-remote-alarm-monitor.html'//,
+        // controller: 'VerifyNestCtrl'
       }
     }
   })
@@ -402,7 +962,9 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
     url:  '/verify/:deviceTitle',
     views: {
       'menuContent': {
-        template: '<ion-view><ion-content><h3 class="padding">Verification coming soon!</h3></ion-view></ion-content>'
+        // template: '<ion-view><ion-content><h3 class="padding">Verification coming soon!</h3></ion-view></ion-content>'
+        controller: 'VerifyUnknownDeviceCtrl',
+        templateUrl: 'templates/verify/unknown-device.html'
       }
     }
   })
@@ -432,6 +994,26 @@ angular.module('starter', ['firebase', 'ionic', 'ionic.cloud', 'ionic-material',
     views: {
       'menuContent': {
         templateUrl: 'templates/login.html',
+        controller: 'LoginCtrl'
+      }
+    }
+  })
+
+  .state('app.profile', {
+    url: '/profile',
+    views: {
+      'menuContent': {
+        templateUrl : 'templates/profile2.html',
+        controller  : 'ProfileCtrl'
+      }
+    }
+  })
+
+  .state('app.register', {
+    url: '/register',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/register-your-account.html',
         controller: 'LoginCtrl'
       }
     }

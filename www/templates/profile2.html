@@ -1,0 +1,123 @@
+<ion-view id='profile' cache-view='false'>
+    
+    <form name='profile'>
+    
+    <div class="bar bar-header" style='box-shadow:none'>
+            <button ng-click='cancel()' class="button button-clear">
+            <i class="icon ion-close dark-green-text"></i>
+            </button>
+            
+            <h1 class='title'>Edit profile</h1>
+
+            <button ng-disabled="profile.$invalid" ng-click='save()' class="button button-clear">
+            <i class="icon ion-checkmark dark-green-text"></i>
+            </button>
+        </div>
+    
+    <ion-content class='has-header'>
+
+        <div class='card'>
+            <!-- <form name='profile'> -->
+            <label class='item item-input'>
+
+                <i class="icon ion-android-contact placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.name.first' placeholder="First name"></input>
+
+            </label>
+
+            <label class='item item-input'>
+
+                <i class="icon placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.name.last' placeholder="Last name"></input>
+
+            </label>
+
+            <label class='item item-input'>
+
+                <i class="icon ion-ios-telephone placeholder-icon"></i>
+                <input type='text' name='mobilePhone' ng-model='userDetails.mobilePhone' ng-pattern='/^\(?(\d{3})\)?[ .-]?(\d{3})[ .-]?(\d{4})$/' placeholder="Phone"></input>
+
+            </label>
+
+            <div ng-show='profile.mobilePhone.$invalid' class="form-error">Please enter valid 10-digit #</div>
+
+            <label class='item item-input'>
+
+                <i class="icon ion-at placeholder-icon" style="
+                    background-color: #f8f8f8;
+                    height: 34px;
+                    line-height: 34px;
+                "></i>
+                <input disabled='disabled' type='text' name='email' ng-model='user.email'></input>
+
+            </label>
+
+        </div>
+        
+        <div class='card'>
+
+            <label class='item item-input'>
+
+                <i class="icon ion-home placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.address.houseNumber' placeholder="House number"></input>
+
+            </label>
+
+            <label class='item item-input'>
+
+                <i class="icon placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.address.streetName' placeholder="Street name"></input>
+
+            </label>
+
+            <label class='item item-input'>
+
+                <i class="icon placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.address.city' placeholder="City"></input>
+
+            </label>
+
+            <!-- <label class='item item-input'>
+
+                <i class="icon placeholder-icon"></i>
+                <input type='text' ng-model='userDetails.address.state' placeholder="State"></input>
+
+            </label> -->
+
+            <label class='item item-input item-select'>
+
+                <i class="icon placeholder-icon"></i>
+
+                <div class='input-label'>
+                    State
+                </div>
+
+                <select ng-model='userDetails.address.state' ng-options='abbr as state for (abbr , state) in states'>
+                    
+                </select>
+
+                <!-- <select>
+                    <option ng-repeat='state in states'>{{ state }}</option>
+                </select> -->
+
+                <!-- <input type='text' ng-model='userDetails.address.state' placeholder="State"></input> -->
+
+            </label>
+
+            <label class='item item-input'>
+
+                <i class="icon placeholder-icon"></i>
+                <input name='zip' type='text' ng-model='userDetails.address.zip' ng-minlength='5' ng-maxlength='5' placeholder="ZIP"></input>
+
+            </label>
+
+            <div ng-show='profile.zip.$invalid' class="form-error">Please enter valid ZIP</div>
+
+            <!-- </form> -->
+        </div>
+
+    </ion-content>
+
+    </form>
+
+</ion-view>
